@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Real_App.Data;
+using Real_App.Interfaces;
 using Real_App.Model;
 
-namespace Real_App.Data.Repository;
+namespace Real_App.Repository;
 
 public class CityRepository : ICityRepository
 {
@@ -19,15 +21,12 @@ public class CityRepository : ICityRepository
     {
         _dc.Cities.Add(city);
     }
-
+ 
     public void DeleteCity(int id)
     {
         var city = _dc.Cities.Find(id);
         _dc.Cities.Remove(city);
     }
 
-    public async Task<bool> SaveAsync()
-    {
-        return await _dc.SaveChangesAsync() > 0;
-    }
+    
 }

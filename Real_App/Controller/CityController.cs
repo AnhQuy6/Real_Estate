@@ -1,51 +1,49 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Real_App.Data;
-using Real_App.Data.Repository;
+using Real_App.Interfaces;
 using Real_App.Model;
+using Real_App.Repository;
 
 namespace Real_App.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
     public class CityController : ControllerBase
-    
     {
-        private readonly ICityRepository _repo;
-        public CityController(ICityRepository repo)
+        private readonly IUnitOfWork _uow;
+        public CityController(IUnitOfWork uow)
         {
-            _repo = repo;
+            _uow = uow;
         }
         
-        //Get api/city/all
+        // api/city/all
         [HttpGet]
         [Route("all")]
         public async Task<ActionResult<IEnumerable<City>>> GetCitiesAsync()
         {
-            var cities = await _repo.GetCitiesAsync();
+            var cities = await _uow.CityRepository.GetCitiesAsync();
             return Ok(cities);
         }
-
         
         // api/city/add
         [HttpPost]
         [Route("add")]
         public async Task<ActionResult<City>> AddCity(City city)
         {
-            _repo.AddCity(city);
-            await _repo.SaveAsync();
+            _uow.CityRepository.AddCity(city);
+            await _uow.SaveAsync();
             return StatusCode(201);
         }
-
+        
+        // api/city/delete/{id}
         [HttpDelete]
         [Route("delete/{id}")]
         public async Task<ActionResult<int>> DeleteCity(int id)
         {
-            _repo.DeleteCity(id);
-            await _repo.SaveAsync();
+            _uow.CityRepository.DeleteCity(id);
+            await _uow.SaveAsync();
             return Ok(id);
         }
-        
     }
 }
+ 
