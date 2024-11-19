@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Real_App.Dtos;
 using Real_App.Interfaces;
 using Real_App.Model;
 using Real_App.Repository;
@@ -19,17 +20,31 @@ namespace Real_App.Controller
         // api/city/all
         [HttpGet]
         [Route("all")]
-        public async Task<ActionResult<IEnumerable<City>>> GetCitiesAsync()
+        public async Task<ActionResult<IEnumerable<CityDto>>> GetCitiesAsync()
         {
             var cities = await _uow.CityRepository.GetCitiesAsync();
-            return Ok(cities);
+
+            var citiesDto = (from c in cities
+                            select new CityDto()
+                            {
+                                Id = c.Id,
+                                Name = c.Name,
+                            }).ToList();
+
+            return Ok(citiesDto);
         }
         
         // api/city/add
         [HttpPost]
         [Route("add")]
-        public async Task<ActionResult<City>> AddCity(City city)
+        public async Task<ActionResult<CityDto>> AddCity(CityDto cityDto)
         {
+            City city = new City()
+            {
+                Name = cityDto.Name,
+                LastUpdatedBy = 1,
+                LastUpdatedOn = DateTime.Now,
+            };
             _uow.CityRepository.AddCity(city);
             await _uow.SaveAsync();
             return StatusCode(201);

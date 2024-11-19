@@ -12,8 +12,7 @@ public class UnitOfWork : IUnitOfWork
     {
         _dc = dc;
     }
-
-
+    
     public ICityRepository CityRepository => 
         new CityRepository(_dc);
 
