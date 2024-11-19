@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Real_App.Data;
+using Real_App.Helpers;
 using Real_App.Interfaces;
 using Real_App.Repository;
 
@@ -16,6 +17,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnect"));
 });
+builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
 
 var app = builder.Build();
 

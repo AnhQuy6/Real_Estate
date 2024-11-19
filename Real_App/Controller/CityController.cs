@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Real_App.Dtos;
@@ -12,9 +13,11 @@ namespace Real_App.Controller
     public class CityController : ControllerBase
     {
         private readonly IUnitOfWork _uow;
-        public CityController(IUnitOfWork uow)
+        private readonly IMapper _mapper;
+        public CityController(IUnitOfWork uow, IMapper mapper)
         {
             _uow = uow;
+            _mapper = mapper;
         }
         
         // api/city/all
@@ -23,14 +26,7 @@ namespace Real_App.Controller
         public async Task<ActionResult<IEnumerable<CityDto>>> GetCitiesAsync()
         {
             var cities = await _uow.CityRepository.GetCitiesAsync();
-
-            var citiesDto = (from c in cities
-                            select new CityDto()
-                            {
-                                Id = c.Id,
-                                Name = c.Name,
-                            }).ToList();
-
+            var citiesDto = _mapper.Map<IEnumerable<CityDto>>(cities);
             return Ok(citiesDto);
         }
         
@@ -39,12 +35,9 @@ namespace Real_App.Controller
         [Route("add")]
         public async Task<ActionResult<CityDto>> AddCity(CityDto cityDto)
         {
-            City city = new City()
-            {
-                Name = cityDto.Name,
-                LastUpdatedBy = 1,
-                LastUpdatedOn = DateTime.Now,
-            };
+            var city = _mapper.Map<City>(cityDto);
+            city.LastUpdatedOn = DateTime.Now;
+            city.LastUpdatedBy = 1;
             _uow.CityRepository.AddCity(city);
             await _uow.SaveAsync();
             return StatusCode(201);
