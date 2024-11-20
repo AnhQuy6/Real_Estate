@@ -1,8 +1,11 @@
 using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Real_App.Dtos;
 using Real_App.Interfaces;
+using Real_App.Migrations;
 using Real_App.Model;
 using Real_App.Repository;
 
@@ -51,6 +54,32 @@ namespace Real_App.Controller
             _uow.CityRepository.DeleteCity(id);
             await _uow.SaveAsync();
             return Ok(id);
+        }
+
+        // api/city/update/{id}
+        [HttpPut]
+        [Route("update/{id}")]
+        public async Task<ActionResult<City>> UpdateCity(int id, CityDto cityDto)
+        {
+            var cityFromDb = await _uow.CityRepository.FindCity(id);
+            cityFromDb.LastUpdatedOn = DateTime.Now;
+            cityFromDb.LastUpdatedBy = 1;
+            _mapper.Map(cityDto, cityFromDb);
+            await _uow.SaveAsync();
+            return StatusCode(200);
+        }
+
+        [HttpPatch]
+        [Route("update/{id}")]
+        public async Task<ActionResult<City>> UpdateCityPatch(int id, JsonPatchDocument<City> cityToPatch) 
+        {
+            var cityFromDb = await _uow.CityRepository.FindCity(id);
+            cityFromDb.LastUpdatedOn = DateTime.Now;
+            cityFromDb.LastUpdatedBy = 1;
+
+            cityToPatch.ApplyTo(cityFromDb, ModelState);
+            await _uow.SaveAsync();
+            return StatusCode(200);
         }
     }
 }

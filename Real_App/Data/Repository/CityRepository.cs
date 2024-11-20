@@ -28,5 +28,8 @@ public class CityRepository : ICityRepository
         _dc.Cities.Remove(city);
     }
 
-    
+    public async Task<City> FindCity(int id)
+    {
+        return await _dc.Cities.Where(s=>s.Id == id).FirstOrDefaultAsync();
+    }
 }
