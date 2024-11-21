@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Real_App.Data;
 using Real_App.Helpers;
 using Real_App.Interfaces;
+using Real_App.Middlewares;
 using Real_App.Repository;
 
 
@@ -28,7 +29,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseAuthorization();
 

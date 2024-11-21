@@ -28,6 +28,7 @@ namespace Real_App.Controller
         [Route("all")]
         public async Task<ActionResult<IEnumerable<CityDto>>> GetCitiesAsync()
         {
+            throw new UnauthorizedAccessException();
             var cities = await _uow.CityRepository.GetCitiesAsync();
             var citiesDto = _mapper.Map<IEnumerable<CityDto>>(cities);
             return Ok(citiesDto);
@@ -61,12 +62,20 @@ namespace Real_App.Controller
         [Route("update/{id}")]
         public async Task<ActionResult<City>> UpdateCity(int id, CityDto cityDto)
         {
-            var cityFromDb = await _uow.CityRepository.FindCity(id);
-            cityFromDb.LastUpdatedOn = DateTime.Now;
-            cityFromDb.LastUpdatedBy = 1;
-            _mapper.Map(cityDto, cityFromDb);
-            await _uow.SaveAsync();
-            return StatusCode(200);
+                if (id != cityDto.Id)
+                    return BadRequest("Update not allowed");
+
+                var cityFromDb = await _uow.CityRepository.FindCity(id);
+                if (cityFromDb == null)
+                    return BadRequest("Update not allowed");
+                cityFromDb.LastUpdatedOn = DateTime.Now;
+                cityFromDb.LastUpdatedBy = 1;
+                _mapper.Map(cityDto, cityFromDb);
+
+                throw new NotImplementedException();
+                await _uow.SaveAsync();
+                return StatusCode(200);
+   
         }
 
         [HttpPatch]
