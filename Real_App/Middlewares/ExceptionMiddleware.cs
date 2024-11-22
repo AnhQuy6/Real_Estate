@@ -1,5 +1,4 @@
 ﻿
-using Microsoft.AspNetCore.Hosting;
 using Real_App.Errors;
 using System.Net;
 using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;

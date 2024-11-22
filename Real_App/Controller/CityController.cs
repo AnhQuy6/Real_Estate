@@ -28,7 +28,6 @@ namespace Real_App.Controller
         [Route("all")]
         public async Task<ActionResult<IEnumerable<CityDto>>> GetCitiesAsync()
         {
-            throw new UnauthorizedAccessException();
             var cities = await _uow.CityRepository.GetCitiesAsync();
             var citiesDto = _mapper.Map<IEnumerable<CityDto>>(cities);
             return Ok(citiesDto);
@@ -72,7 +71,6 @@ namespace Real_App.Controller
                 cityFromDb.LastUpdatedBy = 1;
                 _mapper.Map(cityDto, cityFromDb);
 
-                throw new NotImplementedException();
                 await _uow.SaveAsync();
                 return StatusCode(200);
    
