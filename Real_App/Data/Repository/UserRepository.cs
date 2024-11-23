@@ -9,13 +9,14 @@ namespace Real_App.Data.Repository
         private readonly DataContext _dc;
         public UserRepository(DataContext dc)
         {
-
             _dc = dc;
-
         }
+
         public async Task<User> Authenticate(string userName, string password)
         {
             return await _dc.Users.FirstOrDefaultAsync(x => x.Username == userName && x.Password == password);
         }
+
+
     }
 }

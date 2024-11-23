@@ -1,13 +1,16 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Real_App.Data;
 using Real_App.Helpers;
 using Real_App.Interfaces;
 using Real_App.Middlewares;
 using Real_App.Repository;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("key")));
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -19,7 +22,17 @@ builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnect"));
 });
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opt =>
+    {
+        opt.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("key")))
+        };
+    });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,6 +46,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionMiddleware>();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

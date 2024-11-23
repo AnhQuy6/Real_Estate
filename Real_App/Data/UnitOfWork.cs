@@ -7,7 +7,6 @@ namespace Real_App.Data;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly DataContext _dc;
-    private ICityRepository _cityRepository;
 
     public UnitOfWork(DataContext dc)
     {
