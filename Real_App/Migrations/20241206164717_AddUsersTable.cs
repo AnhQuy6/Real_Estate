@@ -5,12 +5,11 @@
 namespace Real_App.Migrations
 {
     /// <inheritdoc />
-    public partial class Adduser : Migration
+    public partial class AddUsersTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql(@"UPDATE [dbo].[Cities] SET [Country] = 'USA' WHERE [Country] IS NULL");
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -18,7 +17,8 @@ namespace Real_App.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Password = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    PasswordKey = table.Column<byte[]>(type: "varbinary(max)", nullable: false)
                 },
                 constraints: table =>
                 {

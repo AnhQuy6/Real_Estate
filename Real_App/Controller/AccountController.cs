@@ -37,28 +37,48 @@ namespace Real_App.Controller
             return Ok(loginRes);
         }
 
+        [HttpPost]
+        [Route("Register")]
+        public async Task<IActionResult> Register(LoginReqDto loginReq)
+        {
+            if (await _uow.UserRepository.UserAlreadyExists(loginReq.Username))
+                return BadRequest("User already exists, please try something else");
+
+            _uow.UserRepository.Register(loginReq.Username, loginReq.Password);
+            await _uow.SaveAsync();
+
+            return StatusCode(201);
+        }
+
         private string CreateJWT(User user)
         {
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("key")));
+            // Tạo khóa đối xứng
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetSection("AppSetting:Key").Value));
+
+            //PAYLOAD
             var claims = new Claim[]
             {
+                // Mỗi Claim là một cặp key-value
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
+            // Xác định phương pháp ký cho JWT
             var signingCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
+            // Mô tả cấu hình và nội dung của Token
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(20),
+                Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = signingCredentials
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
-
         }
+
+        
     }
 }

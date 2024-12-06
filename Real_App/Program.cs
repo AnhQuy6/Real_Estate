@@ -6,11 +6,11 @@ using Real_App.Helpers;
 using Real_App.Interfaces;
 using Real_App.Middlewares;
 using Real_App.Repository;
+using System.Configuration;
 using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("key")));
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -19,9 +19,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyConnect"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Myconnect"));
 });
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles).Assembly);
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSetting:Key").Value));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
     {
@@ -30,9 +31,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidateIssuer = false,
             ValidateAudience = false,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("key")))
+            IssuerSigningKey = key,
         };
     });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
