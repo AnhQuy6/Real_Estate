@@ -19,6 +19,9 @@ public class UnitOfWork : IUnitOfWork
     public IUserRepository UserRepository => 
         new UserRepository(_dc);
 
+    public IPropertyRepository PropertyRepository =>
+        new PropertyRepository(_dc);
+
     public async Task<bool> SaveAsync()
     {
         return await _dc.SaveChangesAsync() > 0;
