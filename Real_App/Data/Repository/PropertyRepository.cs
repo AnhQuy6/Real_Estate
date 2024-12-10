@@ -22,9 +22,15 @@ namespace Real_App.Data.Repository
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Property>> GetPropertiesAsync()
+        public async Task<IEnumerable<Property>> GetPropertiesAsync(int sellRent)
         {
-            return await _dc.Properties.ToListAsync();
+            var properties = await _dc.Properties
+                            .Include(p => p.PropertyType)
+                            .Include(p => p.FurnishingType)
+                            .Include (p => p.City)
+                            .Where(p => p.SellRent == sellRent)
+                            .ToListAsync();
+            return properties;
         }
 
     }
