@@ -22,6 +22,13 @@ public class UnitOfWork : IUnitOfWork
     public IPropertyRepository PropertyRepository =>
         new PropertyRepository(_dc);
 
+
+    public IPropertyTypeRepository PropertyTypeRepository => 
+        new PropertyTypeRepository(_dc);
+
+    public IFurnishingTypeRepository FurnishingTypeRepository => 
+        new FurnishingTypeRepository(_dc);
+
     public async Task<bool> SaveAsync()
     {
         return await _dc.SaveChangesAsync() > 0;
