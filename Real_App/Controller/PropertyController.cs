@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Real_App.Dtos;
@@ -9,7 +10,7 @@ namespace Real_App.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PropertyController : ControllerBase
+    public class PropertyController : BaseController
     {
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
@@ -39,11 +40,13 @@ namespace Real_App.Controller
 
         [HttpPost]
         [Route("add")]
+        [Authorize]
         public async Task<IActionResult> AddProperty(PropertyDto propertyDto)
         {
             var property = _mapper.Map<Property>(propertyDto);
-            property.PostedBy = 1;
-            property.LastUpdatedBy = 1;
+            var userId = GetUserId();
+            property.PostedBy = userId;
+            property.LastUpdatedBy = userId;
             _uow.PropertyRepository.AddProperty(property);
             await _uow.SaveAsync();
             return StatusCode(201);
